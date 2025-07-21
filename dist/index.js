@@ -1,6 +1,9 @@
 "use strict";
 
 (function () {
+    // --- 更新日志 ---
+    // - 在秘钥输入框最后边，增加“复制”按钮（粘贴板）图标，点击即可复制KEY。
+
     // --- 配置、常量与持久化 ---
     const SCRIPT_NAME = 'API秘钥管理器';
     const LOG_PREFIX = `[${SCRIPT_NAME}]`;
@@ -266,6 +269,9 @@
         const $keyRow = parent$(`
             <div class="key-row" data-index="${index}">
                 <input type="text" class="config-key" placeholder="秘钥" value="${value}">
+                <button class="menu_button copy-key-btn" title="复制秘钥">
+                    <i class="fa-solid fa-clipboard"></i>
+                </button>
                 <button class="menu_button api-keys-dropdown-btn" title="KEY列表">
                     <i class="fa-solid fa-angles-down"></i>
                 </button>
@@ -1016,6 +1022,7 @@
         parent$('body').off('click', `#${PANEL_ID} .add-profile-btn`);
         parent$('body').off('click', `#${PANEL_ID} .delete-profile-btn`);
         parent$('body').off('click', `#${PANEL_ID} .profile-tab`);
+        parent$('body').off('click', `#${PANEL_ID} .copy-key-btn`);
         parent$('body').off('click', `#${PANEL_ID} .api-keys-dropdown-btn`);
         parent$('body').off('click', `#${PANEL_ID} .api-key-item`);
         parent$('body').off('click', `#${PANEL_ID} .delete-key-btn`);
@@ -1093,6 +1100,18 @@
             }
         });
         parent$('body').on('click', `#${PANEL_ID} .profile-tab`, async function () { const $clickedTab = parent$(this); if ($clickedTab.hasClass('active')) return; await saveCurrentProfileData(); parent$(`#${PANEL_ID} .profile-tab`).removeClass('active'); $clickedTab.addClass('active'); renderConfigUnits(); });
+
+        parent$('body').on('click', `#${PANEL_ID} .copy-key-btn`, function (e) {
+            e.stopPropagation();
+            const keyToCopy = parent$(this).siblings('.config-key').val();
+            if (keyToCopy) {
+                fallbackCopy(keyToCopy, parentDoc);
+            } else {
+                if (typeof toastr !== 'undefined') {
+                    toastr.info('秘钥为空，无需复制');
+                }
+            }
+        });
 
         parent$('body').on('click', `#${PANEL_ID} .api-keys-dropdown-btn`, function (e) {
             e.stopPropagation();
